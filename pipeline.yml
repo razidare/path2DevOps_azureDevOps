@@ -1,0 +1,32 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest' # set to windows-latest or another Windows vmImage for Windows builds
+
+variables:
+- group: docker-credentials
+- name: registry_name
+  value: "shikki/"
+
+steps:
+- task: Powershell@2
+  displayName: Build an image
+  inputs:
+    targetType: inline
+    script: |
+
+      $image = $env:REGISTRY_NAME + $env:BUILD_DEFINITIONNAME + ":" + $env:BUILD_BUILDNUMBER
+      $image = $image.toLower()
+      Write-Output "Calculated image: $image"
+
+      #compile image
+      docker build . -t $image
+
+      #login to docker hub account
+      docker login --password $env:dockerPassword --username $env:dockerUsername
+
+      docker push $image
+  env:
+    dockerPassword: $(dockerPassword)
+    dockerUsername: $(dockerUsername)
