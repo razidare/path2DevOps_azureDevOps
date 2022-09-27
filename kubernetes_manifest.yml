@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: #{appName}#
+spec:
+  type: #{serviceType}#
+  selector:
+    app: #{appName}#
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: #{containerPort}#
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: #{appName}#
+spec:
+  replicas: #{replicas}#
+  selector:
+    matchLabels:
+      app: #{appName}# # has to match .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: #{appName}# # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: #{appName}#
+        image: #{fullImageName}
+        ports:
+        - containerPort: #{containerPort}#
+        resources:
+          limits:
+            cpu: 200m
+            memory: 400Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
