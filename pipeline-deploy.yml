@@ -1,0 +1,69 @@
+resources:
+  repositories:
+  - repository: tools
+    type: git
+    name: Tools
+
+variables:
+- group: cartapi-deploy
+- group: k8s-deploy
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest' # set to windows-latest or another Windows vmImage for Windows builds
+
+steps:
+- checkout: tools
+
+- task: Powershell@2
+  displayName: Read ENV vars
+  inputs:
+    targetType: inline
+    script: |
+      gci env:
+
+- task: Powershell@2
+  displayName: Prepare deployment
+  inputs:
+    targetType: inline
+    script: |
+
+      #check that the files from the Tools repo are here
+      gci | select name, fullname
+
+      #compose necessary variables
+      $env:FULLIMAGENAME = "shikki/cartapi:" + $env:IMAGE_TAG
+      $path2Manifest = gci | where {$_.name -eq "kubernetes_manifest.yaml"} | select -expand fullname
+      $path2Script = gci | where {$_.name -eq "Set-TokenValues.ps1"} | select -expand fullname
+
+      Write-Output "======= Variable values ======="
+      $env:FULLIMAGENAME
+      $path2Manifest
+      $path2Script
+
+      #replace tokens in manifest
+      Write-Output "======= Replacing tokens in the manifest ======="
+      Invoke-Expression "$path2Script -inputFilePath $path2Manifest"
+
+      #let's read the manifest too
+      Write-Output "======= Manifest content ======="
+      Get-Content $path2Manifest
+      
+- task: AzureCLI@2
+  displayName: deploy to AKS
+  inputs:
+    azureSubscription: <NAME OF YOUR AZURE RESOURCE MANAGER SERVICE CONNECTION>
+    scriptType: pscore
+    scriptLocation: inlineScript
+    inlineScript: |
+
+      #get aks credentials
+      az aks get-credentials -n $env:CLUSTER_NAME -g $env:CLUSTER_RG --admin
+      $path2Manifest = gci | where {$_.name -eq "kubernetes_manifest.yaml"} | select -expand fullname
+
+      #check if kubernetes namespace exists and create if not
+      kubectl create namespace $env:DEPLOYMENT_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+
+      #actual deploy
+      kubectl apply -f $path2Manifest --namespace $env:DEPLOYMENT_NAMESPACE

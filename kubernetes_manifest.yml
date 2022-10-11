@@ -1,37 +1,44 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: #{appName}#
+  name: #{APPNAME}#
 spec:
-  type: #{serviceType}#
+  type: #{SERVICETYPE}#
   selector:
-    app: #{appName}#
+    app: #{APPNAME}#
   ports:
     - protocol: TCP
       port: 80
-      targetPort: #{containerPort}#
+      targetPort: #{CONTAINERPORT}#
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: #{appName}#
+  name: #{APPNAME}#
 spec:
-  replicas: #{replicas}#
+  replicas: #{REPLICAS}#
   selector:
     matchLabels:
-      app: #{appName}# # has to match .spec.template.metadata.labels
+      app: #{APPNAME}# # has to match .spec.template.metadata.labels
   template:
     metadata:
       labels:
-        app: #{appName}# # has to match .spec.selector.matchLabels
+        app: #{APPNAME}# # has to match .spec.selector.matchLabels
     spec:
       containers:
-      - name: #{appName}#
-        image: #{fullImageName}#
+      - name: #{APPNAME}#
+        image: #{FULLIMAGENAME}#
+        env:
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "#{SPRING_DATASOURCE_PASSWORD}#"
+        - name: SPRING_DATASOURCE_URL
+          value: "#{SPRING_DATASOURCE_URL}#"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "#{SPRING_DATASOURCE_USERNAME}#"
         ports:
-        - containerPort: #{containerPort}#
+        - containerPort: #{CONTAINERPORT}#
         resources:
           limits:
             cpu: 200m
