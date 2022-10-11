@@ -49,6 +49,9 @@ steps:
       #let's read the manifest too
       Write-Output "======= Manifest content ======="
       Get-Content $path2Manifest
+  env:
+    SPRING_DATASOURCE_PASSWORD: $(SPRING_DATASOURCE_PASSWORD)
+    SPRING_DATASOURCE_USERNAME: $(SPRING_DATASOURCE_USERNAME)
       
 - task: AzureCLI@2
   displayName: deploy to AKS
