@@ -5,7 +5,7 @@ resources:
     name: Tools
 
 variables:
-- group: cartapi-deploy
+- group: <NAME OF THE MICROSERVICE>-deploy
 - group: k8s-deploy
 
 trigger: none
@@ -33,7 +33,7 @@ steps:
       gci | select name, fullname
 
       #compose necessary variables
-      $env:FULLIMAGENAME = "shikki/cartapi:" + $env:IMAGE_TAG
+      $env:FULLIMAGENAME = "shikki/<NAME OF THE MICROSERVICE>:" + $env:IMAGE_TAG
       $path2Manifest = gci | where {$_.name -eq "kubernetes_manifest.yaml"} | select -expand fullname
       $path2Script = gci | where {$_.name -eq "Set-TokenValues.ps1"} | select -expand fullname
 
