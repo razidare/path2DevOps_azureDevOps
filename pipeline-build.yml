@@ -7,7 +7,7 @@ pool:
 variables:
 - group: docker-credentials
 - name: registry_name
-  value: "shikki/"
+  value: "<YOUR REGISTRY NAME FOLLOWED BY FORWARDSLASH eg: shikki/ >"
 
 steps:
 - task: Powershell@2
