@@ -1,4 +1,9 @@
 resources:
+  pipelines:
+  - pipeline: parent  #string reference you will use in this yaml file
+    source: parent-build #name of the source pipeline
+    trigger: true
+
   repositories:
   - repository: tools
     type: git
@@ -15,6 +20,29 @@ pool:
 
 steps:
 - checkout: tools
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download variables'
+  inputs:
+    buildType: 'specific'
+    project: '<YOUR AZURE DEVOPS PROJECT ID>'
+    pipeline: '<PARENT PIPELINE DEFINITION ID>'
+    buildVersionToDownload: 'latest'
+    downloadType: 'specific'
+    downloadPath: '$(System.ArtifactsDirectory)'
+
+- task: Powershell@2
+  displayName: Ingest variables from build pipeline
+  inputs:
+    targetType: inline
+    script: |
+      $content = Get-Content  $env:SYSTEM_ARTIFACTSDIRECTORY/variables/pipeline.env
+      foreach($line in $content) {
+        $key=$line.split("=")[0]
+        $value=$line.split("=")[1]
+        Write-Host "##vso[task.setvariable variable=$key]$value"
+        Write-Verbose "Creating new variable $key with value $value" -vb
+      }
 
 - task: Powershell@2
   displayName: Read ENV vars

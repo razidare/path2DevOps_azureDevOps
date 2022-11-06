@@ -27,6 +27,17 @@ steps:
       docker login --password $env:dockerPassword --username $env:dockerUsername
 
       docker push $image
+
+      #create artifact from variable
+      "IMAGE_TAG=$env:BUILD_BUILDNUMBER" > "$env:BUILD_ARTIFACTSTAGINGDIRECTORY/pipeline.env"
+
   env:
     dockerPassword: $(dockerPassword)
     dockerUsername: $(dockerUsername)
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish variables
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'variables'
+    publishLocation: 'Container'
