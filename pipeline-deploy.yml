@@ -34,7 +34,7 @@ steps:
 
       #compose necessary variables
       $env:FULLIMAGENAME = "shikki/<NAME OF THE MICROSERVICE>:" + $env:IMAGE_TAG
-      $path2Manifest = gci | where {$_.name -like "kubernetes_manifest.*"} | select -expand fullname
+      $path2Manifest = gci -recurse | where {$_.name -eq "values.yaml"} | select -expand fullname
       $path2Script = gci | where {$_.name -eq "Set-TokenValues.ps1"} | select -expand fullname
 
       Write-Output "======= Variable values ======="
@@ -61,6 +61,9 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
 
+      #render helm template
+      helm template ./barbart
+
       #get aks credentials
       az aks get-credentials -n $env:CLUSTER_NAME -g $env:CLUSTER_RG --admin
       $path2Manifest = gci | where {$_.name -eq "kubernetes_manifest.yaml"} | select -expand fullname
@@ -69,4 +72,5 @@ steps:
       kubectl create namespace $env:DEPLOYMENT_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
       #actual deploy
-      kubectl apply -f $path2Manifest --namespace $env:DEPLOYMENT_NAMESPACE
+      helm upgrade $env:APPNAME ./barbart --namespace $env:DEPLOYMENT_NAMESPACE
+      # kubectl apply -f $path2Manifest --namespace $env:DEPLOYMENT_NAMESPACE #obsolete
