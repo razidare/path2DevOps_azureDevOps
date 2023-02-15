@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }} # has to match .spec.template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }} # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: {{ .Values.appName }}
+        image: {{ .Values.fullImageName }}
+        env:
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "#{SPRING_DATASOURCE_PASSWORD}#"
+        - name: SPRING_DATASOURCE_URL
+          value: "#{SPRING_DATASOURCE_URL}#"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "#{SPRING_DATASOURCE_USERNAME}#"
+        ports:
+        - containerPort: {{ .Values.containerPort }}
+        resources:
+          limits:
+            cpu: 200m
+            memory: 400Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi

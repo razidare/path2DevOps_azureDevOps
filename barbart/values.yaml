@@ -1,0 +1,9 @@
+appName: #{APPNAME}#
+
+service:
+  type: #{SERVICETYPE}#
+  port: #{SERVICEPORT}#
+
+containerPort: #{CONTAINERPORT}#
+replicas: #{REPLICAS}#
+fullImageName: #{FULLIMAGENAME}#
