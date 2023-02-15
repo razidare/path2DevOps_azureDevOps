@@ -72,5 +72,5 @@ steps:
       kubectl create namespace $env:DEPLOYMENT_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
       #actual deploy
-      helm upgrade $env:APPNAME ./barbart --namespace $env:DEPLOYMENT_NAMESPACE
+      helm upgrade $env:APPNAME ./barbart --namespace $env:DEPLOYMENT_NAMESPACE --install
       # kubectl apply -f $path2Manifest --namespace $env:DEPLOYMENT_NAMESPACE #obsolete
