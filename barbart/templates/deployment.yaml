@@ -16,12 +16,10 @@ spec:
       - name: {{ .Values.appName }}
         image: {{ .Values.fullImageName }}
         env:
-        - name: SPRING_DATASOURCE_PASSWORD
-          value: "#{SPRING_DATASOURCE_PASSWORD}#"
-        - name: SPRING_DATASOURCE_URL
-          value: "#{SPRING_DATASOURCE_URL}#"
-        - name: SPRING_DATASOURCE_USERNAME
-          value: "#{SPRING_DATASOURCE_USERNAME}#"
+        {{- range $key, $value := .Values.extraEnv }}
+          - name: {{ $key }}
+            value: {{ $value }}
+        {{- end }}
         ports:
         - containerPort: {{ .Values.containerPort }}
         resources:
