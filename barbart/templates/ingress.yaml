@@ -9,9 +9,15 @@ metadata:
   {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
-  defaultBackend:
-    service:
-      name: {{ .Values.appName }}
-      port:
-        number: {{ .Values.service.port }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ .Values.appName }}
+            port:
+              number: {{ .Values.service.port }}
 {{- end -}}

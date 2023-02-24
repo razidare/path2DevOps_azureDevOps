@@ -14,6 +14,7 @@ extraEnv:
   SPRING_DATASOURCE_USERNAME: "#{SPRING_DATASOURCE_USERNAME}#"
 
 ingress:
+  host: record.domain.ro
   enabled: #{INGRESSENABLED}#
   className: nginx
   annotations:
