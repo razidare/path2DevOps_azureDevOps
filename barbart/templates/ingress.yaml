@@ -20,4 +20,8 @@ spec:
             name: {{ .Values.appName }}
             port:
               number: {{ .Values.service.port }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.appName }}-tls
 {{- end -}}
